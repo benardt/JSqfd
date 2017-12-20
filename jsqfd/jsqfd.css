@@ -1,0 +1,36 @@
+.mybox {
+	stroke-width: 1px;
+	stroke: black;
+	fill: whitesmoke;
+}
+
+.mybom {
+	stroke-width: 1px;
+	stroke: black;
+}
+
+.mycase {
+	stroke-width: 1px;
+	stroke: darkgray;
+	fill: white;
+}
+
+.mylosange {
+	stroke-width: 1px;
+	stroke: darkgray;
+	fill: white;
+}
+
+.mytexthow {
+	fill: black;
+	font-weight: normal;
+}
+
+.mytexthowselected {
+	fill: black;
+	font-weight: bold;
+}
+
+.mytextassy {
+	fill: red;
+}
