@@ -5,8 +5,8 @@
 
 /*globals d3 */
 
-
 'use strict';
+
 /**
  * Library for QFD
  */
@@ -22,7 +22,15 @@ var JSqfd = (function() {
 		funcw: 100,
 		rowoffset: 500,
 		truncdialog: 44,
-		aliashowsimportance: 'Manufacturing difficulty'
+		aliashowsimportance: 'Manufacturing difficulty',
+
+	};
+
+	var constant = {
+		sqrt2div2: 0.70710678118,
+		text_strong: "\u25C9",
+		text_weak: "\u25CE",
+		text_cross: "\u274C"
 	};
 
 	var color = d3.scaleOrdinal(d3.schemeCategory20);
@@ -71,6 +79,43 @@ var JSqfd = (function() {
 		return -1;
 	};
 
+	/**
+	 * Calculate length (in pixel) of text
+	 * 
+	 * @param {string} pText
+	 * @param {number} font size (ie 12 for 12pt)
+	 * @param {string} style (ie Arial)
+	 * @return {number} length of text
+	 */
+	var textlength = function(pText, pFontSize, pStyle) {
+		var lDiv = document.createElement('div');
+		var width;
+
+		document.body.appendChild(lDiv);
+
+		if (pStyle !== null) {
+			lDiv.style = pStyle;
+		}
+		lDiv.style.fontSize = String(pFontSize) + "px";
+		lDiv.style.position = "absolute";
+		lDiv.style.left = -1000;
+		lDiv.style.top = -1000;
+
+		lDiv.innerHTML = pText;
+
+		//var lResult = {
+		//	width: lDiv.clientWidth,
+		//	height: lDiv.clientHeight
+		//};
+		width = lDiv.clientWidth;
+		document.body.removeChild(lDiv);
+		lDiv = null;
+
+		//return lResult;
+		return width;
+
+	};
+
 	var handleMouseOver = function(d) {
 
 		d3.select("#" + d.charid)
@@ -115,16 +160,20 @@ var JSqfd = (function() {
 	};
 
 	var drawDialogbox = function(myContainer) {
-
-		var dialogBox = myContainer.append("g").attr("id", "groupDialogbox");
-		dialogBox.append("rect").attr("class", "mybox")
-			.attr("x", 10)
-			.attr("y", 10)
-			.attr("rx", 8)
-			.attr("ry", 8)
-			.attr("width", 250)
-			.attr("height", 250)
-			.style("stroke-opacity", 0.0);
+		var that = {};
+		that.render = function() {
+			var dialogBox = myContainer.append("g").attr("id", "groupDialogbox");
+			dialogBox.append("rect").attr("class", "mybox")
+				.attr("id", 'myDiagBox')
+				.attr("x", 10)
+				.attr("y", 10)
+				.attr("rx", 8)
+				.attr("ry", 8)
+				.attr("width", 250)
+				.attr("height", 250)
+				.style("stroke-opacity", 0.0);
+		};
+		return that;
 	};
 
 	var drawWhat = function(myContainer, myArray) {
@@ -319,23 +368,14 @@ var JSqfd = (function() {
 			.attr("transform", function(d) {
 				return "rotate(45 " + d.x + " " + d.y + ")";
 			})
-			.attr("width", config.texth * 0.70711)
-			.attr("height", config.texth * 0.70711);
+			.attr("width", config.texth * constant.sqrt2div2)
+			.attr("height", config.texth * constant.sqrt2div2);
 
-
-		var dummychar = svgContainer.append("text")
-			.attr("class", "mytext")
-			.attr("x", 0)
-			.attr("y", 0)
-			.text(JSqfd.constant.text_cross);
-		// compute length of text to automatize the center position of text
-		var tlength = dummychar.node().getComputedTextLength();
-		dummychar.attr("style", "display: none;");
 
 		correlations.append("text")
 			.attr("class", "mytext")
 			.attr("x", function(d) {
-				return d.x - tlength * 0.5;
+				return d.x - JSqfd.utils.textlength(constant.text_cross, myContainer) * 0.5;
 			})
 			.attr("y", function(d) {
 				return d.y + config.texth * 0.5;
@@ -343,7 +383,7 @@ var JSqfd = (function() {
 			.attr("dy", ".35em")
 			.text(function(d) {
 				if (d.value !== null) {
-					return JSqfd.constant.text_cross;
+					return constant.text_cross;
 				}
 			});
 
@@ -381,10 +421,10 @@ var JSqfd = (function() {
 			.style("text-anchor", "middle")
 			.text(function(d) {
 				if (d.value === "strong") {
-					return JSqfd.constant.text_strong;
+					return constant.text_strong;
 				}
 				if (d.value === "weak") {
-					return JSqfd.constant.text_weak;
+					return constant.text_weak;
 				}
 			});
 	};
@@ -554,6 +594,7 @@ var JSqfd = (function() {
 	 */
 	var init = function(mycontainer, myurl, item) {
 		var myText = '';
+
 		if (myobj.length === undefined) {
 			svgContainer = d3.select("#svg1");
 			myText = document.getElementById(mycontainer).innerHTML;
@@ -563,37 +604,26 @@ var JSqfd = (function() {
 		svgContainer.selectAll("*").remove();
 		if (item.checked === true) {
 			doQFD(myobj, true);
-			drawDialogbox(svgContainer);
+			drawDialogbox(svgContainer).render();
 		} else {
 			doQFD(myobj, false);
-			drawDialogbox(svgContainer);
+			drawDialogbox(svgContainer).render();
 		}
 		// Nothing: just to avoid eslint warning due to myurl not used
 		// need to be coded
 		myText = myurl;
 	};
 
-	var drawTreegrid = function() {
-
-		// specify options
-		var options = {
-			"width": "800px",
-			"height": "400px"
-		};
-
-		// Instantiate our treegrid object.
-		var container = document.getElementById("mytreegrid");
-		// The class name of the TreeGrid is links.TreeGrid
-		var treegrid = new links.TreeGrid(container, options);
-		var mydata = new links.DataTable(myobj);
-
-		// Draw our treegrid with the created data and options 
-		treegrid.draw(mydata);
+	/**
+	 * get data
+	 */
+	var getData = function() {
+		return myobj;
 	};
 
 	return {
+		getData: getData,
 		init: init,
-		drawTreegrid: drawTreegrid,
 		drawDialogbox: drawDialogbox,
 		doQFD: doQFD,
 		handleMouseOver: handleMouseOver,
@@ -603,16 +633,12 @@ var JSqfd = (function() {
 		drawCorrelation: drawCorrelation,
 		drawWhat: drawWhat,
 		drawRelationship: drawRelationship,
-		constant: {
-			text_strong: "\u25C9",
-			text_weak: "\u25CE",
-			text_cross: "\u274C"
-		},
 		utils: {
 			arrayObjectIndexOf: arrayObjectIndexOf,
 			arrayObjectIndexOf2: arrayObjectIndexOf2,
 			removeDuplicates: removeDuplicates,
-			trunc: trunc
+			trunc: trunc,
+			textlength: textlength
 		}
 	};
 })();
