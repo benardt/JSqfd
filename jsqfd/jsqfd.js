@@ -6,11 +6,11 @@
 /*globals d3 */
 
 
-"use strict";
+'use strict';
 /**
  * Library for QFD
  */
-var myLibrary = (function() {
+var JSqfd = (function() {
 
 	var svgContainer;
 	var myobj = {};
@@ -22,7 +22,7 @@ var myLibrary = (function() {
 		funcw: 100,
 		rowoffset: 500,
 		truncdialog: 44,
-		aliashowsimportance: "Manufacturing difficulty"
+		aliashowsimportance: 'Manufacturing difficulty'
 	};
 
 	var color = d3.scaleOrdinal(d3.schemeCategory20);
@@ -134,7 +134,7 @@ var myLibrary = (function() {
 		for (i = 0; i < len; i += 1) {
 			functions.push(myArray[i].function);
 		}
-		functions = myLibrary.utils.removeDuplicates(functions);
+		functions = JSqfd.utils.removeDuplicates(functions);
 
 		var whats = myContainer.append("g").attr("id", "groupWhats").selectAll("rect")
 			.data(myArray)
@@ -208,8 +208,8 @@ var myLibrary = (function() {
 			.attr("y", config.rowoffset + config.texth * level)
 			.attr("width", config.texth)
 			.attr("height", config.texth)
-			.on("mouseover", myLibrary.handleMouseOver)
-			.on("mouseout", myLibrary.handleMouseOut);
+			.on("mouseover", JSqfd.handleMouseOver)
+			.on("mouseout", JSqfd.handleMouseOut);
 
 		howsImportance.append("text")
 			.attr("class", "mytext")
@@ -233,7 +233,7 @@ var myLibrary = (function() {
 		for (i = 0; i < len; i += 1) {
 			bom.push(myArray[i].component);
 		}
-		bom = myLibrary.utils.removeDuplicates(bom);
+		bom = JSqfd.utils.removeDuplicates(bom);
 
 		var hows = myContainer.append("g").attr("id", "groupHows").selectAll("rect")
 			.data(myArray)
@@ -327,7 +327,7 @@ var myLibrary = (function() {
 			.attr("class", "mytext")
 			.attr("x", 0)
 			.attr("y", 0)
-			.text(myLibrary.constant.text_cross);
+			.text(JSqfd.constant.text_cross);
 		// compute length of text to automatize the center position of text
 		var tlength = dummychar.node().getComputedTextLength();
 		dummychar.attr("style", "display: none;");
@@ -343,7 +343,7 @@ var myLibrary = (function() {
 			.attr("dy", ".35em")
 			.text(function(d) {
 				if (d.value !== null) {
-					return myLibrary.constant.text_cross;
+					return JSqfd.constant.text_cross;
 				}
 			});
 
@@ -366,8 +366,8 @@ var myLibrary = (function() {
 			})
 			.attr("width", config.texth)
 			.attr("height", config.texth)
-			.on("mouseover", myLibrary.handleMouseOver)
-			.on("mouseout", myLibrary.handleMouseOut);
+			.on("mouseover", JSqfd.handleMouseOver)
+			.on("mouseout", JSqfd.handleMouseOut);
 
 		links.append("text")
 			.attr("class", "mytext")
@@ -381,10 +381,10 @@ var myLibrary = (function() {
 			.style("text-anchor", "middle")
 			.text(function(d) {
 				if (d.value === "strong") {
-					return myLibrary.constant.text_strong;
+					return JSqfd.constant.text_strong;
 				}
 				if (d.value === "weak") {
-					return myLibrary.constant.text_weak;
+					return JSqfd.constant.text_weak;
 				}
 			});
 	};
@@ -422,7 +422,7 @@ var myLibrary = (function() {
 		for (irow = 0; irow < len; irow += 1) {
 			myObj[index_cri].data[irow].r = irow;
 		}
-		myLibrary.drawWhat(svgContainer, myObj[index_cri].data);
+		JSqfd.drawWhat(svgContainer, myObj[index_cri].data);
 
 		// HOW characteristics -----------------------------------------------------
 
@@ -431,8 +431,8 @@ var myLibrary = (function() {
 			// all hows linked to current how
 			tx = "";
 			for (i = 0; i <= myObj[index_char].data.length - 1; i += 1) {
-				if (myLibrary.utils.arrayObjectIndexOf2(myObj[index_cor].data, myObj[index_char].data[i].id, "source", myObj[index_char].data[icol].id, "target") !== -1 ||
-					myLibrary.utils.arrayObjectIndexOf2(myObj[index_cor].data, myObj[index_char].data[icol].id, "source", myObj[index_char].data[i].id, "target") !== -1) {
+				if (JSqfd.utils.arrayObjectIndexOf2(myObj[index_cor].data, myObj[index_char].data[i].id, "source", myObj[index_char].data[icol].id, "target") !== -1 ||
+					JSqfd.utils.arrayObjectIndexOf2(myObj[index_cor].data, myObj[index_char].data[icol].id, "source", myObj[index_char].data[i].id, "target") !== -1) {
 
 					tx += myObj[index_char].data[i].id;
 					tx += " ";
@@ -451,8 +451,8 @@ var myLibrary = (function() {
 			len = tmpHows.data.length;
 			for (i = 0; i < len; i += 1) {
 				// find position in array for characteristic and criteria
-				irow = myLibrary.utils.arrayObjectIndexOf(myObj[index_rel].data, tmpHows.data[i].id, "source");
-				icol = myLibrary.utils.arrayObjectIndexOf(myObj[index_rel].data, tmpHows.data[i].id, "target");
+				irow = JSqfd.utils.arrayObjectIndexOf(myObj[index_rel].data, tmpHows.data[i].id, "source");
+				icol = JSqfd.utils.arrayObjectIndexOf(myObj[index_rel].data, tmpHows.data[i].id, "target");
 
 				if (irow === -1 && icol === -1) {
 					tmpHows.data.splice(i, 1);
@@ -467,7 +467,7 @@ var myLibrary = (function() {
 			tmpHows.data[icol].c = icol;
 		}
 
-		myLibrary.drawHow(svgContainer, tmpHows.data);
+		JSqfd.drawHow(svgContainer, tmpHows.data);
 
 		// build correlation array for triangle building----------------------------
 		// i is index of HOW previous
@@ -491,8 +491,8 @@ var myLibrary = (function() {
 				});
 				// Correlation exists if
 				// line exists inside correlation array (index != -1)
-				if (myLibrary.utils.arrayObjectIndexOf2(myObj[index_cor].data, idprev, "source", idnext, "target") !== -1 ||
-					myLibrary.utils.arrayObjectIndexOf2(myObj[index_cor].data, idnext, "source", idprev, "target") !== -1) {
+				if (JSqfd.utils.arrayObjectIndexOf2(myObj[index_cor].data, idprev, "source", idnext, "target") !== -1 ||
+					JSqfd.utils.arrayObjectIndexOf2(myObj[index_cor].data, idnext, "source", idprev, "target") !== -1) {
 					myCorrelations[myCorrelations.length - 1].value = 1;
 				}
 			}
@@ -529,22 +529,22 @@ var myLibrary = (function() {
 		for (i = 0; i < len; i += 1) {
 
 			// find position in array for characteristic and criteria
-			irow = myLibrary.utils.arrayObjectIndexOf(myObj[index_cri].data, myObj[index_rel].data[i].target, "id");
-			icol = myLibrary.utils.arrayObjectIndexOf(tmpHows.data, myObj[index_rel].data[i].source, "id");
+			irow = JSqfd.utils.arrayObjectIndexOf(myObj[index_cri].data, myObj[index_rel].data[i].target, "id");
+			icol = JSqfd.utils.arrayObjectIndexOf(tmpHows.data, myObj[index_rel].data[i].source, "id");
 
 			// find the index inside myLinks[]
 			// if no line (index = -1) inside array myLinks then no relationship
-			index = myLibrary.utils.arrayObjectIndexOf2(myLinks, icol, "c", irow, "r");
+			index = JSqfd.utils.arrayObjectIndexOf2(myLinks, icol, "c", irow, "r");
 			if (index !== -1) {
 				myLinks[index].value = myObj[index_rel].data[i].value;
 			}
 		}
 
 		// draw RELATIONSHIPS ------------------------------------------------------
-		myLibrary.drawRelationship(svgContainer, myLinks);
+		JSqfd.drawRelationship(svgContainer, myLinks);
 
 		// draw IMPORTANCE of HOWs
-		myLibrary.drawHowsImportance(svgContainer, tmpHows.data, myObj[index_cri].data.length);
+		JSqfd.drawHowsImportance(svgContainer, tmpHows.data, myObj[index_cri].data.length);
 
 		return 0;
 	};
@@ -553,7 +553,7 @@ var myLibrary = (function() {
 	 * Initiate QFD building
 	 */
 	var init = function(mycontainer, myurl, item) {
-		var myText = "";
+		var myText = '';
 		if (myobj.length === undefined) {
 			svgContainer = d3.select("#svg1");
 			myText = document.getElementById(mycontainer).innerHTML;
@@ -568,6 +568,9 @@ var myLibrary = (function() {
 			doQFD(myobj, false);
 			drawDialogbox(svgContainer);
 		}
+		// Nothing: just to avoid eslint warning due to myurl not used
+		// need to be coded
+		myText = myurl;
 	};
 
 	var drawTreegrid = function() {
@@ -580,6 +583,7 @@ var myLibrary = (function() {
 
 		// Instantiate our treegrid object.
 		var container = document.getElementById("mytreegrid");
+		// The class name of the TreeGrid is links.TreeGrid
 		var treegrid = new links.TreeGrid(container, options);
 		var mydata = new links.DataTable(myobj);
 

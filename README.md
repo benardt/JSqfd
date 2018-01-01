@@ -20,7 +20,7 @@ For more details about QFD follow: https://en.wikipedia.org/wiki/Quality_functio
 
 ### API reference
 
-* myLibrary.init(mycontainer, myurl, item)
+* JSqfd.init(mycontainer, myurl, item)
  * _mycontainer_: {string} id for div in html file
  * _myurl_: {string} not yet coded
  * _item_: {boolean} true or false to reduce or not QFD matrix
@@ -56,5 +56,4 @@ For relationship 'value' can be only _strong_ or _weak_.
 ## Dependencies
 
 * d3 (https://github.com/d3/d3)
-* d3-tip (https://github.com/Caged/d3-tip)
 * treegrid (https://github.com/almende/chap-links-library/tree/master/js/src/treegrid)

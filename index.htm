@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html>
 
 <head>
@@ -6,7 +7,6 @@
 
 	<meta charset="UTF-8">
 	<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
-	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 	<script src="http://almende.github.io/chap-links-library/js/treegrid/treegrid.js"></script>
 	<link rel="stylesheet" type="text/css" href="http://almende.github.io/chap-links-library/js/treegrid/treegrid.css">
 	<link rel="stylesheet" type="text/css" href="./jsqfd/jsqfd.css">
@@ -14,15 +14,15 @@
 
 	<script>
 		window.onload = function() {
-			myLibrary.init('data', null, false);
-			myLibrary.drawTreegrid();
+			JSqfd.init('data', null, false);
+			JSqfd.drawTreegrid();
 		};
 	</script>
 </head>
 
 <body>
 	<div id="data" style="display: none;">
-		[ { "object": "what", "data": [ { "id":"r001", "name":"Leakage \u003C 3 Pa.s", "function":"To seal", "weight":1}, { "id":"r002", "name":"No damage (Energy 50 J)", "function":"To resist to mechanical environment", "weight":1}, { "id":"r003", "name":"Force \u003C 5 daN", "function":"To limit insertion load", "weight":1}, { "id":"r004", "name":"No damage (1000h @125°C)", "function":"To resist to fluid", "weight":1} ]}, { "object": "how", "data": [ { "id":"c001", "name":"Tore diameter", "component":"oring",
+		[ { "object": "what", "data": [ { "id":"r001", "name":"Leakage \u003C 3 Pa.s", "function":"To seal", "weight":1}, { "id":"r002", "name":"No damage (Energy 50 J)", "function":"To resist to mechanical environment", "weight":1}, { "id":"r003", "name":"Force\u003C 5 daN", "function":"To limit insertion load", "weight":1}, { "id":"r004", "name":"No damage (1000h @125°C)", "function":"To resist to fluid", "weight":1} ]}, { "object": "how", "data": [ { "id":"c001", "name":"Tore diameter", "component":"oring",
 		"part":"part", "value": "", "importance":"1"}, { "id":"c003", "name":"Groove width", "component":"QC", "part":"assy", "value": "", "importance":"1"}, { "id":"c004", "name":"Groove depth", "component":"queue", "part":"part", "value": "", "importance":"1"},
 		{ "id":"c016", "name":"Groove roughness", "component":"queue", "part":"part", "value": "", "importance":"2"}, { "id":"c005", "name":"Wall thickness", "component":"queue", "part":"part", "value": "", "importance":"1"}, { "id":"c008", "name":"ID diameter",
 		"component":"queue", "part":"part", "value": "", "importance":"1"}, { "id":"c009", "name":"ID diameter", "component":"oring stopper", "part":"part", "value": "", "importance":"1"}, { "id":"c006", "name":"Guidance length (before and after oring)", "component":"QC",
@@ -37,18 +37,11 @@
 		"source":"c014", "target":"r003", "value":"strong"}, { "id":"l011", "source":"c015", "target":"r004", "value":"strong"} ]} ]
 	</div>
 
-
 	<div>
 		<!-- Rounded switch -->
-		<label class="switch">
-  Reduced: <input type="checkbox" onchange="myLibrary.init('data', null, this)">
-</label>
+		<label class="switch">Reduced: <input type="checkbox" onchange="JSqfd.init('data', null, this)"></label>
 	</div>
-	<div id="test">
-		<svg id="svg1" height="700" width="800"></svg>
-	</div>
-
+	<div id="test"><svg id="svg1" height="700" width="800"></svg></div>
 	<div id="mytreegrid"></div>
-
 </body>
 </html>
