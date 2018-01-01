@@ -1,5 +1,5 @@
 # JSqfd
-QFD drawing from JSON file
+QFD (Quality Function deployement) drawing from JSON file
 
 ## Screenshots
 
