@@ -16,17 +16,14 @@
 		window.onload = function() {
 			JSqfd.init('data', null, false);
 			
-			var newdata = JSqfd.getData();
-
 			// Print data in a treegrid (for debug)
+			var newdata = JSqfd.getData();
 			var myContainer = 'mytreegrid';
-
 			// specify options
 			var options = {
 				"width": "800px",
 				"height": "400px"
 			};
-
 			// Instantiate our treegrid object.
 			var container = document.getElementById(myContainer);
 			// The class name of the TreeGrid is links.TreeGrid
@@ -37,12 +34,21 @@
 			treegrid.draw(mydata);
 			// End of tree grid
 		};
+
+		// handle input checkbox for option Dailog box
+		function handleClick(cb) {
+			if (cb.checked === true) {
+				JSqfd.drawDialogbox().render();
+			} else {
+				JSqfd.drawDialogbox().remove();
+			}
+		}
 	</script>
 </head>
 
 <body>
 	<div id="data" style="display: none;">
-		[ { "object": "what", "data": [ { "id":"r001", "name":"Leakage \u003C 3 Pa.s", "function":"To seal", "weight":1}, { "id":"r002", "name":"No damage (Energy 50 J)", "function":"To resist to mechanical environment", "weight":1}, { "id":"r003", "name":"Force\u003C5 daN", "function":"To limit insertion load", "weight":1}, { "id":"r004", "name":"No damage (1000h @125°C)", "function":"To resist to fluid", "weight":1} ]}, { "object": "how", "data": [ { "id":"c001", "name":"Tore diameter", "component":"oring", "part":"part",
+		[ { "object": "what", "data": [ { "id":"r001", "name":"Leakage \u003C 3 Pa.s", "function":"To seal", "weight":1}, { "id":"r002", "name":"No damage (Energy 50 J)", "function":"To resist to mechanical environment", "weight":1}, { "id":"r003", "name":"Force\u003C5daN", "function":"To limit insertion load", "weight":1}, { "id":"r004", "name":"No damage (1000h @125°C)", "function":"To resist to fluid", "weight":1} ]}, { "object": "how", "data": [ { "id":"c001", "name":"Tore diameter", "component":"oring", "part":"part",
 		"value": "", "importance":"1"}, { "id":"c003", "name":"Groove width", "component":"QC", "part":"assy", "value": "", "importance":"1"}, { "id":"c004", "name":"Groove depth", "component":"queue", "part":"part", "value": "", "importance":"1"}, { "id":"c016",
 		"name":"Groove roughness", "component":"queue", "part":"part", "value": "", "importance":"2"}, { "id":"c005", "name":"Wall thickness", "component":"queue", "part":"part", "value": "", "importance":"1"}, { "id":"c008", "name":"ID diameter", "component":"queue",
 		"part":"part", "value": "", "importance":"1"}, { "id":"c009", "name":"ID diameter", "component":"oring stopper", "part":"part", "value": "", "importance":"1"}, { "id":"c006", "name":"Guidance length (before and after oring)", "component":"QC", "part":"assy",
@@ -57,10 +63,11 @@
 		"source":"c014", "target":"r003", "value":"strong"}, { "id":"l011", "source":"c015", "target":"r004", "value":"strong"} ]} ]
 	</div>
 
-	<div>
+	<div id="options">
 		<!-- Rounded switch -->
-		<label class="switch">Reduced: <input type="checkbox" onchange="JSqfd.init('data', null, this)"></label>
+		<label class="switch">Reduced: <input type="checkbox" onchange="JSqfd.init('data', null, this)"></label><label class="switch">Dialog box: <input type="checkbox" onchange='handleClick(this);'></label>
 	</div>
+
 	<div id="test"><svg id="svg1" height="700" width="800"></svg></div>
 	<div id="mytreegrid"></div>
 </body>

@@ -13,7 +13,7 @@
 var JSqfd = (function() {
 
 	var svgContainer;
-	var myobj = {};
+	var myObj = {};
 
 	var config = {
 		texth: 20,
@@ -118,6 +118,7 @@ var JSqfd = (function() {
 
 	var handleMouseOver = function(d) {
 
+		// .mytexthowselected: black & bold
 		d3.select("#" + d.charid)
 			.attr("class", "mytexthowselected");
 		d3.selectAll("." + d.charid)
@@ -125,25 +126,29 @@ var JSqfd = (function() {
 		d3.selectAll(".corr_" + d.charid)
 			.style("fill", "Beige");
 
+		// add and fill Dialog Box if Dialog Box exist
 		var tt = d3.select("#groupDialogbox");
 
-		tt.append("text").attr("class", "mytexthow textdialog")
-			.attr("x", 10 + 2)
-			.attr("y", 10 + 10)
-			.attr("dy", ".35em")
-			.text(trunc("Characteristic: " + d.char, config.truncdialog));
+		if (typeof tt !== "undefined") {
 
-		tt.append("text").attr("class", "mytexthow textdialog")
-			.attr("x", 10 + 2)
-			.attr("y", 10 + 25)
-			.attr("dy", ".35em")
-			.text("Id: " + d.charid);
+			tt.append("text").attr("class", "mytexthow textdialog")
+				.attr("x", 10 + 2)
+				.attr("y", 10 + 10)
+				.attr("dy", ".35em")
+				.text(trunc("Characteristic: " + d.char, config.truncdialog));
 
-		tt.append("text").attr("class", "mytexthow textdialog")
-			.attr("x", 10 + 2)
-			.attr("y", 10 + 40)
-			.attr("dy", ".35em")
-			.text("Criteria: " + d.cri);
+			tt.append("text").attr("class", "mytexthow textdialog")
+				.attr("x", 10 + 2)
+				.attr("y", 10 + 25)
+				.attr("dy", ".35em")
+				.text("Id: " + d.charid);
+
+			tt.append("text").attr("class", "mytexthow textdialog")
+				.attr("x", 10 + 2)
+				.attr("y", 10 + 40)
+				.attr("dy", ".35em")
+				.text("Criteria: " + d.cri);
+		}
 
 	};
 
@@ -159,20 +164,35 @@ var JSqfd = (function() {
 		d3.selectAll(".textdialog").remove();
 	};
 
-	var drawDialogbox = function(myContainer) {
+
+	/**
+	 * draw Dialog box
+	 * 
+	 * <p>Check if scg element exists and add rectangle for Dialog box</p>
+	 */
+	var drawDialogbox = function() {
+
 		var that = {};
-		that.render = function() {
-			var dialogBox = myContainer.append("g").attr("id", "groupDialogbox");
-			dialogBox.append("rect").attr("class", "mybox")
-				.attr("id", 'myDiagBox')
-				.attr("x", 10)
-				.attr("y", 10)
-				.attr("rx", 8)
-				.attr("ry", 8)
-				.attr("width", 250)
-				.attr("height", 250)
-				.style("stroke-opacity", 0.0);
-		};
+		
+		if (typeof svgContainer !== 'undefined') {
+			that.render = function() {
+				var dialogBox = svgContainer.append("g").attr("id", "groupDialogbox");
+				dialogBox.append("rect").attr("class", "mybox")
+					.attr("id", 'myDiagBox')
+					.attr("x", 10)
+					.attr("y", 10)
+					.attr("rx", 8)
+					.attr("ry", 8)
+					.attr("width", 250)
+					.attr("height", 250)
+					.style("stroke-opacity", 0.0);
+			};
+
+			that.remove = function() {
+				d3.select("#groupDialogbox").remove();
+			};
+
+		}
 		return that;
 	};
 
@@ -435,7 +455,7 @@ var JSqfd = (function() {
 	 * @param {object} myObj (JSON object)
 	 * @param {boolean} compact (false or true)
 	 */
-	var doQFD = function(myObj, compact) {
+	var doQFD = function(compact) {
 		"use strict";
 
 		var irow;
@@ -586,39 +606,46 @@ var JSqfd = (function() {
 		// draw IMPORTANCE of HOWs
 		JSqfd.drawHowsImportance(svgContainer, tmpHows.data, myObj[index_cri].data.length);
 
+
 		return 0;
 	};
+
+
+	/**
+	 * create svg element and read data
+	 * 
+	 * @param {sring} container id
+	 */
+	var read = function(mycontainer) {
+		var myText = '';
+		if (myObj.length === undefined) {
+			svgContainer = d3.select("#svg1");
+			myText = document.getElementById(mycontainer).innerHTML;
+			myObj = JSON.parse(myText);
+		}
+	};
+		
 
 	/**
 	 * Initiate QFD building
 	 */
 	var init = function(mycontainer, myurl, item) {
-		var myText = '';
-
-		if (myobj.length === undefined) {
-			svgContainer = d3.select("#svg1");
-			myText = document.getElementById(mycontainer).innerHTML;
-			myobj = JSON.parse(myText);
-		}
+		
+		read(mycontainer);
 
 		svgContainer.selectAll("*").remove();
 		if (item.checked === true) {
-			doQFD(myobj, true);
-			drawDialogbox(svgContainer).render();
+			doQFD(true);
 		} else {
-			doQFD(myobj, false);
-			drawDialogbox(svgContainer).render();
+			doQFD(false);
 		}
-		// Nothing: just to avoid eslint warning due to myurl not used
-		// need to be coded
-		myText = myurl;
 	};
 
 	/**
 	 * get data
 	 */
 	var getData = function() {
-		return myobj;
+		return myObj;
 	};
 
 	return {

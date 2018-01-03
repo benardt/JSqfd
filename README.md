@@ -21,9 +21,9 @@ For more details about QFD follow: https://en.wikipedia.org/wiki/Quality_functio
 ### API reference
 
 * JSqfd.init(mycontainer, myurl, item)
- * _mycontainer_: {string} id for div in html file
- * _myurl_: {string} not yet coded
- * _item_: {boolean} true or false to reduce or not QFD matrix
+  * _mycontainer_: {string} id for div in html file
+  * _myurl_: {string} not yet coded
+  * _item_: {boolean} true or false to reduce or not QFD matrix
 
 ### Code example
 
