@@ -200,6 +200,10 @@ var JSqfd = (function() {
 		var i;
 		var len = myArray.length;
 		var functions = [];
+		
+		var tt = d3.select('#groupWhats');
+		tt.remove();
+		
 		for (i = 0; i < len; i += 1) {
 			functions.push(myArray[i].function);
 		}
@@ -249,21 +253,9 @@ var JSqfd = (function() {
 	};
 
 	var drawHowsImportance = function(myContainer, myArray, level) {
-
-		var howsImportanceLabel = myContainer.append("g").attr("id", "groupImportance");
-
-		howsImportanceLabel.append("rect").attr("class", "mybox")
-			.attr("x", 10 + config.funcw)
-			.attr("y", config.rowoffset + level * config.texth)
-			.attr("width", config.textw)
-			.attr("height", config.texth);
-
-		howsImportanceLabel.append("text").attr("class", "mytext")
-			.attr("x", 10 + 2 + config.funcw)
-			.attr("y", config.rowoffset + config.texth / 2 + level * config.texth)
-			.attr("dy", ".35em")
-			.style("font-weight", "bold")
-			.text(config.aliashowsimportance);
+		
+		var tt = d3.select('#groupImportance');
+		tt.remove();
 
 		var howsImportance = myContainer.append("g").attr("id", "groupImportance").selectAll("rect")
 			.data(myArray)
@@ -291,6 +283,21 @@ var JSqfd = (function() {
 			.text(function(d) {
 				return d.importance;
 			});
+			
+		var howsImportanceLabel = myContainer.select("#groupImportance");
+
+		howsImportanceLabel.append("rect").attr("class", "mybox")
+			.attr("x", 10 + config.funcw)
+			.attr("y", config.rowoffset + level * config.texth)
+			.attr("width", config.textw)
+			.attr("height", config.texth);
+
+		howsImportanceLabel.append("text").attr("class", "mytext")
+			.attr("x", 10 + 2 + config.funcw)
+			.attr("y", config.rowoffset + config.texth / 2 + level * config.texth)
+			.attr("dy", ".35em")
+			.style("font-weight", "bold")
+			.text(config.aliashowsimportance);
 
 		return 0;
 	};
@@ -299,6 +306,10 @@ var JSqfd = (function() {
 		var bom = [];
 		var i;
 		var len = myArray.length;
+		
+		var tt = d3.select('#groupHows');
+		tt.remove();
+		
 		for (i = 0; i < len; i += 1) {
 			bom.push(myArray[i].component);
 		}
@@ -370,8 +381,11 @@ var JSqfd = (function() {
 
 
 	var drawCorrelation = function(myContainer, myArray) {
+		
+		var tt = d3.select('#groupCorrelation');
+		tt.remove();
 
-		var correlations = myContainer.append("g").selectAll("rect")
+		var correlations = myContainer.append("g").attr("id", "groupCorrelation").selectAll("rect")
 			.data(myArray)
 			.enter();
 
@@ -411,7 +425,12 @@ var JSqfd = (function() {
 	};
 
 	var drawRelationship = function(myContainer, myArray) {
+		
+		// First remove the g element #groupRelationship to clean svg
+		var tt = d3.select('#groupRelationship');
+		tt.remove();
 
+		// Second create the g element #groupRelationship
 		var links = myContainer.append("g").attr("id", "groupRelationship").selectAll("rect")
 			.data(myArray)
 			.enter();
@@ -448,6 +467,61 @@ var JSqfd = (function() {
 				}
 			});
 	};
+	
+	
+	/**
+	 * build correlation array
+	 * 
+	 * <p>
+	 * build correlation array for triangle building
+	 * losange is located at the middle of how[i] and how[j]
+	 * more i and j are far, more losange is high located
+	 * i is index of HOW previous
+	 * j is index of HOW next
+	 * </p>
+	 * 
+	 * @param {array} myHow
+	 * @return {array} myCorr
+	 */
+	var buildCorrelations = function(myHow, index) {
+		var myCorr = [];
+		var i, j,
+		    idprev,
+		    idnext,
+		    len;
+
+		len = myHow.length;
+
+		for (i = 0; i <= len - 2; i += 1) {
+			for (j = i + 1; j <= len - 1; j += 1) {
+				// get id for HOW i and j
+				idprev = myHow[i].id;
+				idnext = myHow[j].id;
+
+				myCorr.push({
+					i: i,
+					j: j,
+					idp: idprev,
+					idn: idnext,
+					value: null
+				});
+				// Correlation exists if
+				// line exists inside correlation array (index != -1)
+				if (JSqfd.utils.arrayObjectIndexOf2(myObj[index].data, idprev, "source", idnext, "target") !== -1 ||
+					JSqfd.utils.arrayObjectIndexOf2(myObj[index].data, idnext, "source", idprev, "target") !== -1) {
+					myCorr[myCorr.length - 1].value = 1;
+				}
+			}
+		}
+
+		len = myCorr.length;
+		for (i = 0; i < len; i += 1) {
+			myCorr[i].x = 10 + config.funcw + config.textw + myCorr[i].j * config.texth - 0.5 * (myCorr[i].j - myCorr[i].i - 1) * config.texth;
+			myCorr[i].y = config.rowoffset - config.bomh - config.textw - 0.5 * (myCorr[i].j - myCorr[i].i + 1) * config.texth;
+		}
+
+		return myCorr;
+	};
 
 	/**
 	 * Main function to draw QFD matrix
@@ -461,7 +535,6 @@ var JSqfd = (function() {
 		var irow;
 		var icol;
 		var i;
-		var j;
 		var len;
 		var index;
 		var index_cri;
@@ -469,15 +542,13 @@ var JSqfd = (function() {
 		var index_cor;
 		var index_rel;
 		var tmpHows = [];
-		var idprev;
-		var idnext;
 
 		index_cri = 0;
 		index_char = 1;
 		index_cor = 2;
 		index_rel = 3;
 
-		// draw WHAT criteria ------------------------------------------------------
+		// WHAT ------------------------------------------------------
 		len = myObj[index_cri].data.length;
 		for (irow = 0; irow < len; irow += 1) {
 			myObj[index_cri].data[irow].r = irow;
@@ -485,7 +556,6 @@ var JSqfd = (function() {
 		JSqfd.drawWhat(svgContainer, myObj[index_cri].data);
 
 		// HOW characteristics -----------------------------------------------------
-
 		var tx = "";
 		for (icol = 0; icol <= myObj[index_char].data.length - 1; icol += 1) {
 			// all hows linked to current how
@@ -503,10 +573,10 @@ var JSqfd = (function() {
 			myObj[index_char].data[icol].datacorr = tx;
 		}
 
-		// Draw HOWs ---------------------------------------------------------------
+		// HOWs ---------------------------------------------------------------
 		tmpHows = JSON.parse(JSON.stringify(myObj[index_char]));
 
-		// remove all HOWS without any relationship
+		// remove all HOWS without no relationship
 		if (compact) {
 			len = tmpHows.data.length;
 			for (i = 0; i < len; i += 1) {
@@ -529,41 +599,9 @@ var JSqfd = (function() {
 
 		JSqfd.drawHow(svgContainer, tmpHows.data);
 
-		// build correlation array for triangle building----------------------------
-		// i is index of HOW previous
-		// j is index of HOW next
-
+		// Correlations ------------------------------------------------------------
 		var myCorrelations = [];
-		len = tmpHows.data.length;
-
-		for (i = 0; i <= len - 2; i += 1) {
-			for (j = i + 1; j <= len - 1; j += 1) {
-				// get id for HOW i and j
-				idprev = tmpHows.data[i].id;
-				idnext = tmpHows.data[j].id;
-
-				myCorrelations.push({
-					i: i,
-					j: j,
-					idp: idprev,
-					idn: idnext,
-					value: null
-				});
-				// Correlation exists if
-				// line exists inside correlation array (index != -1)
-				if (JSqfd.utils.arrayObjectIndexOf2(myObj[index_cor].data, idprev, "source", idnext, "target") !== -1 ||
-					JSqfd.utils.arrayObjectIndexOf2(myObj[index_cor].data, idnext, "source", idprev, "target") !== -1) {
-					myCorrelations[myCorrelations.length - 1].value = 1;
-				}
-			}
-		}
-
-		len = myCorrelations.length;
-		for (i = 0; i < len; i += 1) {
-			myCorrelations[i].x = 10 + config.funcw + config.textw + myCorrelations[i].j * config.texth - 0.5 * (myCorrelations[i].j - myCorrelations[i].i - 1) * config.texth;
-			myCorrelations[i].y = config.rowoffset - config.bomh - config.textw - 0.5 * (myCorrelations[i].j - myCorrelations[i].i + 1) * config.texth;
-		}
-
+		myCorrelations = buildCorrelations(tmpHows.data, index_cor);
 		drawCorrelation(svgContainer, myCorrelations);
 
 		// Relationships -----------------------------------------------------------
@@ -610,7 +648,6 @@ var JSqfd = (function() {
 		return 0;
 	};
 
-
 	/**
 	 * create svg element and read data
 	 * 
@@ -630,15 +667,9 @@ var JSqfd = (function() {
 	 * Initiate QFD building
 	 */
 	var init = function(mycontainer, myurl, item) {
-		
+		// Add procedure for myurl
 		read(mycontainer);
-
-		svgContainer.selectAll("*").remove();
-		if (item.checked === true) {
-			doQFD(true);
-		} else {
-			doQFD(false);
-		}
+		doQFD(item);
 	};
 
 	/**
