@@ -1,8 +1,3 @@
-/**
- * Library for QFD
- */
-
-
 /*globals d3 */
 
 'use strict';
@@ -21,9 +16,7 @@ var JSqfd = (function() {
 		bomh: 100,
 		funcw: 100,
 		rowoffset: 500,
-		truncdialog: 44,
-		aliashowsimportance: 'Manufacturing difficulty',
-
+		truncdialog: 44
 	};
 
 	var constant = {
@@ -173,7 +166,7 @@ var JSqfd = (function() {
 	var drawDialogbox = function() {
 
 		var that = {};
-		
+
 		if (typeof svgContainer !== 'undefined') {
 			that.render = function() {
 				var dialogBox = svgContainer.append("g").attr("id", "groupDialogbox");
@@ -200,10 +193,10 @@ var JSqfd = (function() {
 		var i;
 		var len = myArray.length;
 		var functions = [];
-		
+
 		var tt = d3.select('#groupWhats');
 		tt.remove();
-		
+
 		for (i = 0; i < len; i += 1) {
 			functions.push(myArray[i].function);
 		}
@@ -252,52 +245,111 @@ var JSqfd = (function() {
 		return 0;
 	};
 
+
+	/**
+	 * draw Importance data
+	 * 
+	 * <p>Importance are linked to Hows</p>
+	 * 
+	 * @param {svg element} myContainer svg object
+	 * @param {array} Hows.data
+	 * @param {number} number of Whats
+	 * 
+	 */
 	var drawHowsImportance = function(myContainer, myArray, level) {
-		
+		var i, j;
+		var myLabel = [];
+		var myData = [];
+
 		var tt = d3.select('#groupImportance');
 		tt.remove();
 
-		var howsImportance = myContainer.append("g").attr("id", "groupImportance").selectAll("rect")
-			.data(myArray)
-			.enter();
+		// Create g element with id groupImportance
+		var howsImportance = myContainer.append("g").attr("id", "groupImportance");
 
-		howsImportance.append("rect")
+		var index = arrayObjectIndexOf(myArray[0].others, "importance", "others");
+
+		// Build array with relevant data for Importance
+		for (i = 0; i <= myArray.length - 1; i += 1) {
+			for (j = 0; j <= myArray[i].others[index].data.length - 1; j += 1) {
+				myData.push({
+					c: i, // column position
+					r: j, // row position
+					value: myArray[i].others[index].data[j].value
+				});
+				// Take all label and clean data after (see Remove duplicates from an array of objects)
+				myLabel.push({
+					name: myArray[i].others[index].data[j].name,
+					r: j
+				});
+			}
+		}
+
+		// Remove duplicates from an array of objects in JavaScript: findIndex() method
+		myLabel = myLabel.filter((thing, index, self) =>
+			index === self.findIndex((t) => t.name === thing.name && t.r === thing.r)
+		);
+
+		var importanceLabel = howsImportance.append("g").attr("id", "importanceLabel");
+		importanceLabel.selectAll("rect")
+			.data(myLabel)
+			.enter()
+			.append("rect").attr("class", "mybox")
+			.attr("x", 10 + config.funcw)
+			.attr("y", function(d) {
+				return config.rowoffset + (level + d.r) * config.texth;
+			})
+			.attr("width", config.textw)
+			.attr("height", config.texth);
+
+		importanceLabel.selectAll("text")
+			.data(myLabel)
+			.enter()
+			.append("text").attr("class", "mytext")
+			.attr("x", 10 + 2 + config.funcw)
+			.attr("y", function(d) {
+				return config.rowoffset + config.texth / 2 + (level + d.r) * config.texth;
+			})
+			.attr("dy", ".35em")
+			.style("font-weight", "bold")
+			.text(function(d) {
+				return d.name;
+			});
+
+
+		var importanceData = howsImportance.append("g").attr("id", "importanceData");
+		importanceData.selectAll("rect")
+			.data(myData)
+			.enter()
+			.append("rect")
 			.attr("class", "mycase")
 			.attr("x", function(d) {
 				return 10 + config.funcw + config.textw + config.texth * d.c;
 			})
-			.attr("y", config.rowoffset + config.texth * level)
+			.attr("y", function(d) {
+				return config.rowoffset + config.texth * (level + d.r);
+			})
 			.attr("width", config.texth)
 			.attr("height", config.texth)
 			.on("mouseover", JSqfd.handleMouseOver)
 			.on("mouseout", JSqfd.handleMouseOut);
 
-		howsImportance.append("text")
+		importanceData.selectAll("text")
+			.data(myData)
+			.enter()
+			.append("text")
 			.attr("class", "mytext")
 			.attr("x", function(d) {
 				return 10 + config.funcw + config.textw + config.texth * d.c + config.texth / 2;
 			})
-			.attr("y", config.rowoffset + config.texth / 2 + config.texth * level)
+			.attr("y", function(d) {
+				return config.rowoffset + config.texth / 2 + config.texth * (level + d.r);
+			})
 			.attr("dy", ".35em")
 			.style("text-anchor", "middle")
 			.text(function(d) {
-				return d.importance;
+				return d.value;
 			});
-			
-		var howsImportanceLabel = myContainer.select("#groupImportance");
-
-		howsImportanceLabel.append("rect").attr("class", "mybox")
-			.attr("x", 10 + config.funcw)
-			.attr("y", config.rowoffset + level * config.texth)
-			.attr("width", config.textw)
-			.attr("height", config.texth);
-
-		howsImportanceLabel.append("text").attr("class", "mytext")
-			.attr("x", 10 + 2 + config.funcw)
-			.attr("y", config.rowoffset + config.texth / 2 + level * config.texth)
-			.attr("dy", ".35em")
-			.style("font-weight", "bold")
-			.text(config.aliashowsimportance);
 
 		return 0;
 	};
@@ -306,10 +358,10 @@ var JSqfd = (function() {
 		var bom = [];
 		var i;
 		var len = myArray.length;
-		
+
 		var tt = d3.select('#groupHows');
 		tt.remove();
-		
+
 		for (i = 0; i < len; i += 1) {
 			bom.push(myArray[i].component);
 		}
@@ -381,7 +433,7 @@ var JSqfd = (function() {
 
 
 	var drawCorrelation = function(myContainer, myArray) {
-		
+
 		var tt = d3.select('#groupCorrelation');
 		tt.remove();
 
@@ -425,7 +477,7 @@ var JSqfd = (function() {
 	};
 
 	var drawRelationship = function(myContainer, myArray) {
-		
+
 		// First remove the g element #groupRelationship to clean svg
 		var tt = d3.select('#groupRelationship');
 		tt.remove();
@@ -467,8 +519,8 @@ var JSqfd = (function() {
 				}
 			});
 	};
-	
-	
+
+
 	/**
 	 * build correlation array
 	 * 
@@ -486,9 +538,9 @@ var JSqfd = (function() {
 	var buildCorrelations = function(myHow, index) {
 		var myCorr = [];
 		var i, j,
-		    idprev,
-		    idnext,
-		    len;
+			idprev,
+			idnext,
+			len;
 
 		len = myHow.length;
 
@@ -661,7 +713,7 @@ var JSqfd = (function() {
 			myObj = JSON.parse(myText);
 		}
 	};
-		
+
 
 	/**
 	 * Initiate QFD building
@@ -680,6 +732,7 @@ var JSqfd = (function() {
 	};
 
 	return {
+		read: read,
 		getData: getData,
 		init: init,
 		drawDialogbox: drawDialogbox,
