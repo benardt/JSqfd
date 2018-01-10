@@ -34,6 +34,9 @@
             "data": [{
                 "name": "Manufacturing difficulty",
                 "value": "1"
+            }, {
+                "name": "Importance Rating",
+                "value": "35"
             }]
         }]
     }, {
@@ -125,6 +128,9 @@
             "data": [{
                 "name": "Manufacturing difficulty",
                 "value": "1"
+            }, {
+                "name": "Importance Rating",
+                "value": "52"
             }]
         }]
     }, {
@@ -138,6 +144,9 @@
             "data": [{
                 "name": "Manufacturing difficulty",
                 "value": "2"
+            }, {
+                "name": "Importance Rating",
+                "value": "42"
             }]
         }]
     }, {

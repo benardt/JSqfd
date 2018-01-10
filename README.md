@@ -22,7 +22,7 @@ For more details about QFD follow: https://en.wikipedia.org/wiki/Quality_functio
 
 * JSqfd.init(mycontainer, myurl, item)
   * _mycontainer_: {string} id for div in html file
-  * _myurl_: {string} not yet coded
+  * _myurl_: {string} url to find json file
   * _item_: {boolean} true or false to reduce or not QFD matrix
 
 ### Code example

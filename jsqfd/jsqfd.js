@@ -109,6 +109,22 @@ var JSqfd = (function() {
 
 	};
 
+
+	/**
+	 * Test if str is JSON format
+	 * 
+	 * @param {string} str
+	 * @return {boolean} true or false
+	 */
+	function IsJsonString(str) {
+		try {
+			JSON.parse(str);
+		} catch (e) {
+			return false;
+		}
+		return true;
+	}
+
 	var handleMouseOver = function(d) {
 
 		// .mytexthowselected: black & bold
@@ -700,17 +716,45 @@ var JSqfd = (function() {
 		return 0;
 	};
 
+
 	/**
-	 * create svg element and read data
+	 * Load a JSON document from server
 	 * 
-	 * @param {sring} container id
+	 * @param {string} url
+	 */
+	var readfile = function(myurl) {
+
+		var request = new XMLHttpRequest();
+		var strTemp;
+		request.open('GET', myurl, false); // `false` makes the request synchronous
+		request.send(null);
+		if (request.status === 200) {
+			strTemp = request.responseText;
+			if (IsJsonString(strTemp)) {
+				myObj = JSON.parse(strTemp);
+			} else {
+				alert("Error object file!");
+			}
+		}
+		return 0;
+	};
+
+
+
+	/**
+	 * read data from div container id
+	 * 
+	 * @param {string} container id
 	 */
 	var read = function(mycontainer) {
 		var myText = '';
 		if (myObj.length === undefined) {
-			svgContainer = d3.select("#svg1");
 			myText = document.getElementById(mycontainer).innerHTML;
-			myObj = JSON.parse(myText);
+			if (IsJsonString(myText)) {
+				myObj = JSON.parse(myText);
+			} else {
+				alert("Error object file!");
+			}
 		}
 	};
 
@@ -720,7 +764,12 @@ var JSqfd = (function() {
 	 */
 	var init = function(mycontainer, myurl, item) {
 		// Add procedure for myurl
-		read(mycontainer);
+		if (myurl === null) {
+			read(mycontainer);
+		} else {
+			readfile(myurl);
+		}
+		svgContainer = d3.select("#svg1");
 		doQFD(item);
 	};
 
@@ -733,6 +782,7 @@ var JSqfd = (function() {
 
 	return {
 		read: read,
+		readfile: readfile,
 		getData: getData,
 		init: init,
 		drawDialogbox: drawDialogbox,
