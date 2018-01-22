@@ -1,7 +1,17 @@
-.mybox {
+body {
+	font-family: Verdana, Geneva, 'sans-serif';
+	font-size: 9pt;
+}
+
+.mybox.classicdesign {
 	stroke-width: 1px;
 	stroke: black;
 	fill: whitesmoke;
+}
+
+.mybox.flatdesign {
+	stroke-width: 0px;
+	fill: lightgray
 }
 
 .mybom {
