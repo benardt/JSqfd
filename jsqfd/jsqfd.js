@@ -142,19 +142,19 @@ var JSqfd = (function() {
 
 		if (typeof tt !== "undefined") {
 
-			tt.append("text").attr("class", "mytexthow textdialog")
+			tt.append("text").attr("class", "mytextpart textdialog")
 				.attr("x", 10 + 2)
 				.attr("y", 10 + 10)
 				.attr("dy", ".35em")
 				.text(trunc("Characteristic: " + d.char, config.truncdialog));
 
-			tt.append("text").attr("class", "mytexthow textdialog")
+			tt.append("text").attr("class", "mytextpart textdialog")
 				.attr("x", 10 + 2)
 				.attr("y", 10 + 25)
 				.attr("dy", ".35em")
 				.text("Id: " + d.charid);
 
-			tt.append("text").attr("class", "mytexthow textdialog")
+			tt.append("text").attr("class", "mytextpart textdialog")
 				.attr("x", 10 + 2)
 				.attr("y", 10 + 40)
 				.attr("dy", ".35em")
@@ -167,7 +167,7 @@ var JSqfd = (function() {
 
 		d3.selectAll(".mytexthowselected")
 			.each(function() {
-				d3.select(this).attr("class", "mytexthow " + d3.select(this).attr("data-corr"));
+				d3.select(this).attr("class", "mytextpart " + d3.select(this).attr("data-corr"));
 			});
 		d3.selectAll(".corr_" + d.charid)
 			.style("fill", "White");
@@ -219,7 +219,7 @@ var JSqfd = (function() {
 			functions.push(myArray[i].function);
 		}
 		functions = JSqfd.utils.removeDuplicates(functions);
-		
+
 		var offsetx = 10;
 		var myoffsety = config.rowoffset + config.spacing;
 		var mylengthy = config.spacing + config.texth + config.spacing;
@@ -239,7 +239,7 @@ var JSqfd = (function() {
 			})
 			.attr("width", config.funcw)
 			.attr("height", config.texth);
-			
+
 		whats.append("rect").attr("class", "mybox flatdesign")
 			.style("fill", function(d) {
 				return color(functions.indexOf(d.function));
@@ -270,7 +270,7 @@ var JSqfd = (function() {
 			})
 			.attr("width", config.textw)
 			.attr("height", config.texth);
-			
+
 		whats.append("rect").attr("class", "mybox flatdesign")
 			.attr("x", offsetx + config.funcw)
 			.attr("y", function(d) {
@@ -343,16 +343,16 @@ var JSqfd = (function() {
 		var imps = importanceLabel.selectAll("rect")
 			.data(myLabel)
 			.enter();
-			
-	    imps.append("rect").attr("class", "mybox classicdesign")
+
+		imps.append("rect").attr("class", "mybox classicdesign")
 			.attr("x", 10 + config.funcw)
 			.attr("y", function(d) {
 				return config.rowoffset + (level + d.r) * (config.texth + 2 * config.spacing) + config.spacing;
 			})
 			.attr("width", config.textw)
 			.attr("height", config.texth);
-			
-		    imps.append("rect").attr("class", "mybox flatdesign")
+
+		imps.append("rect").attr("class", "mybox flatdesign")
 			.attr("x", 10 + config.funcw)
 			.attr("y", function(d) {
 				return config.rowoffset + (level + d.r) * (config.texth + 2 * config.spacing) + config.spacing;
@@ -406,7 +406,7 @@ var JSqfd = (function() {
 				return 10 + config.funcw + config.textw + d.c * config.texth + config.texth / 2;
 			})
 			.attr("y", function(d) {
-				return config.rowoffset + config.texth / 2 +  (level + d.r) * config.texth;
+				return config.rowoffset + config.texth / 2 + (level + d.r) * config.texth;
 			})
 			.attr("dy", ".35em")
 			.style("text-anchor", "middle")
@@ -424,7 +424,7 @@ var JSqfd = (function() {
 		var bom = [];
 		var i;
 		var len = myArray.length;
-		
+
 		var offsetx = 10 + config.funcw + config.textw;
 
 		var tt = d3.select('#groupHows');
@@ -435,38 +435,50 @@ var JSqfd = (function() {
 		}
 		bom = JSqfd.utils.removeDuplicates(bom);
 
+		for (i = 0; i <= len - 1; i += 1) {
+			myArray[i].dx = config.spacing + myArray[i].c * 2 * config.spacing;
+			myArray[i].rx = offsetx + config.texth * myArray[i].c;
+			myArray[i].ry = config.rowoffset - config.textw;
+			myArray[i].tx = 10 + config.spacing + myArray[i].c * 2 * config.spacing + offsetx + config.texth * myArray[i].c;
+			myArray[i].ty = config.rowoffset - config.textw;
+		}
+
 		var hows = myContainer.append("g").attr("id", "groupHows").selectAll("rect")
 			.data(myArray)
 			.enter();
 
 		hows.append("rect").attr("class", "mybox classicdesign")
 			.attr("x", function(d) {
-				return offsetx + config.texth * d.c;
+				return d.rx;
 			})
-			.attr("y", config.rowoffset - config.textw)
+			.attr("y", function(d) {
+				return d.ry;
+			})
 			.attr("width", config.texth)
 			.attr("height", config.textw)
 			.attr("transform", function(d) {
-				return 'translate(' + String(config.spacing + d.c * 2 * config.spacing) + ',0)';
+				return 'translate(' + String(d.dx) + ',0)';
 			});
 
 		hows.append("rect").attr("class", "mybox flatdesign")
 			.attr("x", function(d) {
-				return offsetx + config.texth * d.c;
+				return d.rx;
 			})
-			.attr("y", config.rowoffset - config.textw)
+			.attr("y", function(d) {
+				return d.ry;
+			})
 			.attr('rx', 5)
 			.attr('ry', 5)
 			.attr("width", config.texth)
 			.attr("height", config.textw)
 			.attr("transform", function(d) {
-				return 'translate(' + String(config.spacing + d.c * 2 * config.spacing) + ',0)';
+				return 'translate(' + String(d.dx) + ',0)';
 			});
 
 		hows.append("text")
-		    .attr("class", function(d) {
-				return "mytexthow " + d.datacorr;
-			}) // space is important
+			.attr("class", function(d) {
+				return "mytextpart " + d.datacorr;
+			})
 			.attr("data-corr", function(d) {
 				return d.datacorr;
 			})
@@ -474,9 +486,11 @@ var JSqfd = (function() {
 				return d.id;
 			})
 			.attr("x", function(d) {
-				return 10 + config.spacing + d.c * 2 * config.spacing + offsetx + config.texth * d.c;
+				return d.tx;
 			})
-			.attr("y", config.rowoffset - config.textw)
+			.attr("y", function(d) {
+				return d.ty;
+			})
 			.attr("dy", ".35em")
 			.attr("writing-mode", 'tb')
 			.text(function(d) {
@@ -488,51 +502,51 @@ var JSqfd = (function() {
 				return color(bom.indexOf(d.component));
 			})
 			.attr("x", function(d) {
-				return offsetx + config.texth * d.c;
+				return d.rx;
 			})
-			.attr("y", config.rowoffset - config.textw - config.bomh)
+			.attr("y", function(d) {
+				return d.ry - config.bomh;
+			})
 			.attr("width", config.texth)
 			.attr("height", config.bomh)
 			.attr("transform", function(d) {
-				return 'translate(' + String(config.spacing + d.c * 2 * config.spacing) + ',0)';
+				return 'translate(' + String(d.dx) + ',0)';
 			});
-			
+
 		hows.append("rect").attr("class", "mybox flatdesign")
 			.style("fill", function(d) {
 				return color(bom.indexOf(d.component));
 			})
 			.attr("x", function(d) {
-				return offsetx + config.texth * d.c;
+				return d.rx;
+			})
+			.attr("y", function(d) {
+				return d.ry - config.bomh;
 			})
 			.attr('rx', 5)
 			.attr('ry', 5)
-			.attr("y", config.rowoffset - config.textw - config.bomh)
 			.attr("width", config.texth)
 			.attr("height", config.bomh)
 			.attr("transform", function(d) {
-				return 'translate(' + String(config.spacing + d.c * 2 * config.spacing) + ',0)';
+				return 'translate(' + String(d.dx) + ',0)';
 			});
-	
+
 		hows.append("text")
 			.attr("class", function(d) {
-				var myVar = "";
-				if (d.part === "assy") {
-					myVar = "mytextassy";
-				} else {
-					myVar = "mytexthow";
-				}
-				return myVar;
+				return "mytext" + d.part;
 			})
 			.attr("x", function(d) {
-				return 10 + config.spacing + d.c * 2 * config.spacing + offsetx + config.texth * d.c;
+				return d.tx;
 			})
-			.attr("y", config.rowoffset - config.textw - config.bomh)
+			.attr("y", function(d) {
+				return d.ry - config.bomh;
+			})
 			.attr("dy", ".35em")
 			.attr("writing-mode", 'tb')
 			.text(function(d) {
 				return d.component;
 			});
-	
+
 		return 0;
 	};
 
@@ -619,20 +633,20 @@ var JSqfd = (function() {
 			.attr("height", config.texth)
 			.on("mouseover", JSqfd.handleMouseOver)
 			.on("mouseout", JSqfd.handleMouseOut);
-			
+
 		links.append("line")
-		    .attr("class", "mycross flatdesign")
-		    .style("stroke", "Gray")
-		    .attr("x1", function(d) {
+			.attr("class", "mycross flatdesign")
+			.style("stroke", "Gray")
+			.attr("x1", function(d) {
 				return offsetx - config.spacing + d.c * config.texth;
 			})
-		    .attr("y1", function(d) {
+			.attr("y1", function(d) {
 				return offsety + config.texth / 2 + d.r * sizey;
 			})
-		    .attr("x2", function(d) {
+			.attr("x2", function(d) {
 				return offsetx + config.spacing + (d.c + 1) * config.texth;
 			})
-		    .attr("y2", function(d) {
+			.attr("y2", function(d) {
 				return offsety + config.texth / 2 + d.r * sizey;
 			})
 			.attr("transform", function(d) {
@@ -640,18 +654,18 @@ var JSqfd = (function() {
 			});
 
 		links.append("line")
-		    .attr("class", "mycross flatdesign")
-		    .style("stroke", "Gray")
-		    .attr("x1", function(d) {
+			.attr("class", "mycross flatdesign")
+			.style("stroke", "Gray")
+			.attr("x1", function(d) {
 				return offsetx + config.texth / 2 + d.c * config.texth;
 			})
-		    .attr("y1", function(d) {
+			.attr("y1", function(d) {
 				return offsety - config.spacing + d.r * sizey;
 			})
-		    .attr("x2", function(d) {
+			.attr("x2", function(d) {
 				return offsetx + config.texth / 2 + d.c * config.texth;
 			})
-		    .attr("y2", function(d) {
+			.attr("y2", function(d) {
 				return offsety + config.spacing + (d.r + 1) * sizey;
 			})
 			.attr("transform", function(d) {
@@ -681,8 +695,8 @@ var JSqfd = (function() {
 			});
 
 	};
-	
-	
+
+
 	/**
 	 * change theme design layout
 	 * 
@@ -691,13 +705,13 @@ var JSqfd = (function() {
 	var changeTheme = function(mybool) {
 		var mytheme;
 		var myelemcoll;
-		
+
 		if (mybool === true) {
 			mytheme = 'flatdesign';
 		} else {
 			mytheme = 'classicdesign';
 		}
-		
+
 		if (mytheme === 'flatdesign') {
 			myelemcoll = d3.selectAll('.classicdesign');
 			myelemcoll.style("opacity", 0);
@@ -708,7 +722,7 @@ var JSqfd = (function() {
 			myelemcoll.style("opacity", 0);
 			myelemcoll = d3.selectAll('.classicdesign');
 			myelemcoll.style("opacity", 1);
-	    }
+		}
 	};
 
 
@@ -967,7 +981,7 @@ var JSqfd = (function() {
 				.attr("height", 100)
 				.append("g")
 				.attr("class", "legend");
-				
+
 			svg.append('text')
 				.attr('class', 'mytext')
 				.attr('x', 5)
