@@ -16,7 +16,6 @@ var JSqfd = (function() {
 		textw: 220, // size for what.criteria & how.characteristic
 		bomh: 100, // size for how.name
 		funcw: 100, // size for what.name
-		rowoffset: 500,
 		truncdialog: 44
 	};
 
@@ -207,7 +206,7 @@ var JSqfd = (function() {
 		return that;
 	};
 
-	var drawWhat = function(myContainer, myArray) {
+	var drawWhat = function(myContainer, myArray, offsety) {
 		var i;
 		var len = myArray.length;
 		var functions = [];
@@ -221,7 +220,7 @@ var JSqfd = (function() {
 		functions = JSqfd.utils.removeDuplicates(functions);
 
 		var offsetx = 10;
-		var myoffsety = config.rowoffset + config.spacing;
+		var myoffsety = offsety + config.bomh + config.textw + config.spacing;
 		var mylengthy = config.spacing + config.texth + config.spacing;
 
 		var whats = myContainer.append("g").attr("id", "groupWhats").selectAll("rect")
@@ -304,7 +303,7 @@ var JSqfd = (function() {
 	 * @param {number} number of Whats
 	 * 
 	 */
-	var drawHowsImportance = function(myContainer, myArray, level) {
+	var drawHowsImportance = function(myContainer, myArray, level, offsety) {
 		var i, j;
 		var myLabel = [];
 		var myData = [];
@@ -338,89 +337,80 @@ var JSqfd = (function() {
 			index === self.findIndex((t) => t.name === thing.name && t.r === thing.r)
 		);
 
-		var importanceLabel = howsImportance.append("g").attr("id", "importanceLabel");
-
-		var imps = importanceLabel.selectAll("rect")
+		// label -----------------------------------------
+		var importanceLabel = howsImportance.append('svg:g')
+		    .attr("id", "importanceLabel")
+		    .attr('transform', 'translate(' + String(10 + config.funcw) + ', ' + String(offsety + config.bomh + config.textw + level * (config.texth + 2 * config.spacing)) + ')');
+		    
+		var imps = importanceLabel.selectAll('g')
 			.data(myLabel)
-			.enter();
+			.enter()
+			.append('svg:g')
+			.attr('id', function(d, i) { return 'myid' + i; } )
+			.attr("transform", function(d) {
+				return 'translate(0,' + String(d.r * (config.texth + 2 * config.spacing)) + ')';
+			});
 
 		imps.append("rect").attr("class", "mybox classicdesign")
-			.attr("x", 10 + config.funcw)
-			.attr("y", function(d) {
-				return config.rowoffset + (level + d.r) * (config.texth + 2 * config.spacing) + config.spacing;
-			})
+			.attr("x", 0)
+			.attr("y", config.spacing)
 			.attr("width", config.textw)
 			.attr("height", config.texth);
 
 		imps.append("rect").attr("class", "mybox flatdesign")
-			.attr("x", 10 + config.funcw)
-			.attr("y", function(d) {
-				return config.rowoffset + (level + d.r) * (config.texth + 2 * config.spacing) + config.spacing;
-			})
+			.attr("x", 0)
+			.attr("y", config.spacing)
 			.attr('rx', 5)
 			.attr('ry', 5)
 			.attr("width", config.textw)
 			.attr("height", config.texth);
 
-		importanceLabel.selectAll("text")
-			.data(myLabel)
-			.enter()
-			.append("text").attr("class", "mytext")
-			.attr("x", 10 + 2 + config.funcw)
-			.attr("y", function(d) {
-				return config.rowoffset + config.texth / 2 + (level + d.r) * (config.texth + 2 * config.spacing) + config.spacing;
-			})
+		imps.append("text").attr("class", "mytext")
+			.attr("x", 2)
+			.attr("y", config.texth / 2 + config.spacing)
 			.attr("dy", ".35em")
 			.style("font-weight", "bold")
 			.text(function(d) {
 				return d.name;
 			});
 
-		var importanceData = howsImportance.append("g").attr("id", "importanceData");
+		// data ------------------------------------
+		var importanceData = howsImportance.append('svg:g')
+			.attr("id", "importanceData")
+			.attr('transform', 'translate(' + String(10 + config.funcw + config.textw) + ', ' + String(offsety + config.bomh + config.textw + level * (config.texth + 2 * config.spacing)) + ')');
 
-		importanceData.selectAll("rect")
+		var impsData = importanceData.selectAll('g')
 			.data(myData)
 			.enter()
-			.append("rect")
+			.append('svg:g')
+			.attr('id', function(d, i) { return 'myid' + i; } )
+			.attr("transform", function(d) {
+				return 'translate(' + d.c * (config.texth + 2 * config.spacing) + ', ' + String(d.r * (config.texth + 2 * config.spacing)) + ')';
+			});
+
+		impsData.append("rect")
 			.attr("class", "mycase")
-			.attr("x", function(d) {
-				return 10 + config.funcw + config.textw + d.c * config.texth;
-			})
-			.attr("y", function(d) {
-				return config.rowoffset + (level + d.r) * config.texth;
-			})
+			.attr("x", config.spacing)
+			.attr("y", config.spacing)
 			.attr("width", config.texth)
 			.attr("height", config.texth)
 			.on("mouseover", JSqfd.handleMouseOver)
-			.on("mouseout", JSqfd.handleMouseOut)
-			.attr("transform", function(d) {
-				return 'translate(' + String(config.spacing + d.c * 2 * config.spacing) + ',' + String(config.spacing + (level + d.r) * 2 * config.spacing) + ')';
-			});
+			.on("mouseout", JSqfd.handleMouseOut);
 
-		importanceData.selectAll("text")
-			.data(myData)
-			.enter()
-			.append("text")
+		impsData.append("text")
 			.attr("class", "mytext")
-			.attr("x", function(d) {
-				return 10 + config.funcw + config.textw + d.c * config.texth + config.texth / 2;
-			})
-			.attr("y", function(d) {
-				return config.rowoffset + config.texth / 2 + (level + d.r) * config.texth;
-			})
+			.attr("x", config.spacing + config.texth / 2)
+			.attr("y", config.spacing + config.texth / 2)
 			.attr("dy", ".35em")
 			.style("text-anchor", "middle")
 			.text(function(d) {
 				return d.value;
-			})
-			.attr("transform", function(d) {
-				return 'translate(' + String(config.spacing + d.c * 2 * config.spacing) + ',' + String(config.spacing + (level + d.r) * 2 * config.spacing) + ')';
 			});
 
 		return 0;
 	};
 
-	var drawHow = function(myContainer, myArray) {
+	var drawHow = function(myContainer, myArray, offsety) {
 		var bom = [];
 		var i;
 		var len = myArray.length;
@@ -438,9 +428,9 @@ var JSqfd = (function() {
 		for (i = 0; i <= len - 1; i += 1) {
 			myArray[i].dx = config.spacing + myArray[i].c * 2 * config.spacing;
 			myArray[i].rx = offsetx + config.texth * myArray[i].c;
-			myArray[i].ry = config.rowoffset - config.textw;
+			myArray[i].ry = offsety;
 			myArray[i].tx = 10 + config.spacing + myArray[i].c * 2 * config.spacing + offsetx + config.texth * myArray[i].c;
-			myArray[i].ty = config.rowoffset - config.textw;
+			myArray[i].ty = offsety;
 		}
 
 		var hows = myContainer.append("g").attr("id", "groupHows").selectAll("rect")
@@ -452,7 +442,7 @@ var JSqfd = (function() {
 				return d.rx;
 			})
 			.attr("y", function(d) {
-				return d.ry;
+				return d.ry + config.bomh;
 			})
 			.attr("width", config.texth)
 			.attr("height", config.textw)
@@ -465,7 +455,7 @@ var JSqfd = (function() {
 				return d.rx;
 			})
 			.attr("y", function(d) {
-				return d.ry;
+				return d.ry + config.bomh;
 			})
 			.attr('rx', 5)
 			.attr('ry', 5)
@@ -489,7 +479,7 @@ var JSqfd = (function() {
 				return d.tx;
 			})
 			.attr("y", function(d) {
-				return d.ty;
+				return d.ty + config.bomh;
 			})
 			.attr("dy", ".35em")
 			.attr("writing-mode", 'tb')
@@ -505,7 +495,7 @@ var JSqfd = (function() {
 				return d.rx;
 			})
 			.attr("y", function(d) {
-				return d.ry - config.bomh;
+				return d.ry;
 			})
 			.attr("width", config.texth)
 			.attr("height", config.bomh)
@@ -521,7 +511,7 @@ var JSqfd = (function() {
 				return d.rx;
 			})
 			.attr("y", function(d) {
-				return d.ry - config.bomh;
+				return d.ry;
 			})
 			.attr('rx', 5)
 			.attr('ry', 5)
@@ -539,7 +529,7 @@ var JSqfd = (function() {
 				return d.tx;
 			})
 			.attr("y", function(d) {
-				return d.ry - config.bomh;
+				return d.ry;
 			})
 			.attr("dy", ".35em")
 			.attr("writing-mode", 'tb')
@@ -554,18 +544,29 @@ var JSqfd = (function() {
 	var drawCorrelation = function(myContainer, myArray) {
 
 		var offsetx = 10 + config.funcw + config.textw;
-		var offsety = config.rowoffset - config.bomh - config.textw + config.spacing;
+		var i, mynb;
+		mynb = -1;
 		var len = myArray.length;
-		for (var i = 0; i < len; i += 1) {
-			myArray[i].x = offsetx + (myArray[i].j - 0.5 * (myArray[i].j - myArray[i].i - 1)) * (config.texth + 2 * config.spacing);
-			myArray[i].y = offsety - (0.5 * (myArray[i].j - myArray[i].i + 1)) * (config.texth + 2 * config.spacing);
+		
+		// This for loop determines the numbers of Hows
+		for (i =0; i < len; i += 1) {
+			if (myArray[i].i >= mynb) {
+				mynb = myArray[i].j;
+			}
+		}
+		
+		for (i = 0; i < len; i += 1) {
+			myArray[i].x = (myArray[i].j - 0.5 * (myArray[i].j - myArray[i].i - 1)) * (config.texth + 2 * config.spacing);
+			myArray[i].y = (0.5 * (mynb - myArray[i].j + myArray[i].i)) * (config.texth + 2 * config.spacing);
 		}
 
 
 		var tt = d3.select('#groupCorrelation');
 		tt.remove();
 
-		var correlations = myContainer.append("g").attr("id", "groupCorrelation").selectAll("rect")
+		var correlations = myContainer.append("g").attr("id", "groupCorrelation")
+			.attr('transform', 'translate(' + offsetx + ', 0)')
+		    .selectAll("rect")
 			.data(myArray)
 			.enter();
 
@@ -603,10 +604,9 @@ var JSqfd = (function() {
 		return 0;
 	};
 
-	var drawRelationship = function(myContainer, myArray) {
+	var drawRelationship = function(myContainer, myArray, myoffsety) {
 
-		var offsety = config.rowoffset;
-		var sizey = config.texth;
+		var offsety = myoffsety + config.bomh + config.textw;
 		var offsetx = 10 + config.funcw + config.textw;
 
 		// First remove the g element #groupRelationship to clean svg
@@ -614,75 +614,48 @@ var JSqfd = (function() {
 		tt.remove();
 
 		// Second create the g element #groupRelationship
-		var links = myContainer.append("g").attr("id", "groupRelationship").selectAll("rect")
+		var mainGroup = myContainer.append('svg:g')
+			.attr("id", "groupRelationship")
+			.attr('transform', 'translate(' + offsetx + ', ' + offsety + ')');
+		
+		var links = mainGroup.selectAll('g')
 			.data(myArray)
-			.enter();
+			.enter()
+			.append('svg:g')
+			.attr('id', function(d, i) { return 'myid' + i; } )
+			.attr("transform", function(d) {
+				return 'translate(' + String(d.c * (config.texth + 2 * config.spacing)) + ',' + String(d.r * (config.texth + 2 * config.spacing)) + ')';
+			});
 
 		links.append("rect")
 			.attr("class", "mycase classicdesign")
-			.attr("x", function(d) {
-				return offsetx + d.c * config.texth;
-			})
-			.attr("y", function(d) {
-				return offsety + d.r * sizey;
-			})
-			.attr("transform", function(d) {
-				return 'translate(' + String(config.spacing + d.c * 2 * config.spacing) + ',' + String(config.spacing + d.r * 2 * config.spacing) + ')';
-			})
+			.attr("x", config.spacing)
+			.attr("y", config.spacing)
 			.attr("width", config.texth)
 			.attr("height", config.texth)
 			.on("mouseover", JSqfd.handleMouseOver)
 			.on("mouseout", JSqfd.handleMouseOut);
+			
+		links.append("line")
+			.attr("class", "mycross flatdesign")
+			.style("stroke", "Gray")
+			.attr("x1", 0)
+			.attr("y1", config.spacing + config.texth / 2)
+			.attr("x2", config.texth + 2 * config.spacing)
+			.attr("y2", config.spacing + config.texth / 2 );
 
 		links.append("line")
 			.attr("class", "mycross flatdesign")
 			.style("stroke", "Gray")
-			.attr("x1", function(d) {
-				return offsetx - config.spacing + d.c * config.texth;
-			})
-			.attr("y1", function(d) {
-				return offsety + config.texth / 2 + d.r * sizey;
-			})
-			.attr("x2", function(d) {
-				return offsetx + config.spacing + (d.c + 1) * config.texth;
-			})
-			.attr("y2", function(d) {
-				return offsety + config.texth / 2 + d.r * sizey;
-			})
-			.attr("transform", function(d) {
-				return 'translate(' + String(config.spacing + d.c * 2 * config.spacing) + ',' + String(config.spacing + d.r * 2 * config.spacing) + ')';
-			});
-
-		links.append("line")
-			.attr("class", "mycross flatdesign")
-			.style("stroke", "Gray")
-			.attr("x1", function(d) {
-				return offsetx + config.texth / 2 + d.c * config.texth;
-			})
-			.attr("y1", function(d) {
-				return offsety - config.spacing + d.r * sizey;
-			})
-			.attr("x2", function(d) {
-				return offsetx + config.texth / 2 + d.c * config.texth;
-			})
-			.attr("y2", function(d) {
-				return offsety + config.spacing + (d.r + 1) * sizey;
-			})
-			.attr("transform", function(d) {
-				return 'translate(' + String(config.spacing + d.c * 2 * config.spacing) + ',' + String(config.spacing + d.r * 2 * config.spacing) + ')';
-			});
+			.attr("x1", config.spacing + config.texth / 2)
+			.attr("y1", 0)
+			.attr("x2", config.spacing + config.texth / 2)
+			.attr("y2", config.texth + 2 * config.spacing);
 
 		links.append("text")
 			.attr("class", "mytext")
-			.attr("x", function(d) {
-				return offsetx + d.c * config.texth + config.texth / 2;
-			})
-			.attr("y", function(d) {
-				return offsety + config.texth / 2 + d.r * sizey;
-			})
-			.attr("transform", function(d) {
-				return 'translate(' + String(config.spacing + d.c * 2 * config.spacing) + ',' + String(config.spacing + d.r * 2 * config.spacing) + ')';
-			})
+			.attr("x", config.spacing + config.texth / 2)
+			.attr("y", config.spacing + config.texth / 2)
 			.attr("dy", ".35em")
 			.style("text-anchor", "middle")
 			.text(function(d) {
@@ -800,12 +773,6 @@ var JSqfd = (function() {
 		index_cor = 2;
 		index_rel = 3;
 
-		// WHAT ------------------------------------------------------
-		len = myObj[index_cri].data.length;
-		for (irow = 0; irow < len; irow += 1) {
-			myObj[index_cri].data[irow].r = irow;
-		}
-		JSqfd.drawWhat(svgContainer, myObj[index_cri].data);
 
 		// HOW characteristics -----------------------------------------------------
 		var tx = "";
@@ -849,12 +816,22 @@ var JSqfd = (function() {
 			myHows.data[icol].c = icol;
 		}
 
-		JSqfd.drawHow(svgContainer, myHows.data);
 
 		// Correlations ------------------------------------------------------------
 		var myCorrelations = [];
 		myCorrelations = buildCorrelations(myHows.data, index_cor);
 		drawCorrelation(svgContainer, myCorrelations);
+		var corrlength = d3.select('#groupCorrelation').node().getBBox().height;
+		
+		// hows
+		JSqfd.drawHow(svgContainer, myHows.data, corrlength + config.spacing);
+		
+		// Whats ------------------------------------------------------
+		len = myObj[index_cri].data.length;
+		for (irow = 0; irow < len; irow += 1) {
+			myObj[index_cri].data[irow].r = irow;
+		}
+		JSqfd.drawWhat(svgContainer, myObj[index_cri].data, corrlength + config.spacing);
 
 		// Relationships -----------------------------------------------------------
 		var myRelationships = [];
@@ -891,10 +868,10 @@ var JSqfd = (function() {
 		}
 
 		// draw RELATIONSHIPS ------------------------------------------------------
-		JSqfd.drawRelationship(svgContainer, myRelationships);
+		JSqfd.drawRelationship(svgContainer, myRelationships, corrlength + config.spacing);
 
 		// draw IMPORTANCE of HOWs
-		JSqfd.drawHowsImportance(svgContainer, myHows.data, myObj[index_cri].data.length);
+		JSqfd.drawHowsImportance(svgContainer, myHows.data, myObj[index_cri].data.length, corrlength + config.spacing);
 
 
 		return 0;
