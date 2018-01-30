@@ -223,19 +223,24 @@ var JSqfd = (function() {
 		var myoffsety = offsety + config.bomh + config.textw + config.spacing;
 		var mylengthy = config.spacing + config.texth + config.spacing;
 
-		var whats = myContainer.append("g").attr("id", "groupWhats").selectAll("rect")
+		var whats = myContainer.append("svg:g")
+		    .attr("id", "groupWhats")
+		    .attr('transform', 'translate(' + String(offsetx) + ', ' + String(myoffsety) + ')')
+		    .selectAll("g")
 			.data(myArray)
-			.enter();
+			.enter()
+			.append('svg:g')
+			.attr('transform', function(d) {
+				return 'translate(0, ' + String(d.r * mylengthy) + ')';
+			});
 
 		// What name function rectangle + text
 		whats.append("rect").attr("class", "mybox classicdesign")
 			.style("fill", function(d) {
 				return color(functions.indexOf(d.function));
 			})
-			.attr("x", offsetx)
-			.attr("y", function(d) {
-				return myoffsety + d.r * mylengthy;
-			})
+			.attr("x", 0)
+			.attr("y", 0)
 			.attr("width", config.funcw)
 			.attr("height", config.texth);
 
@@ -243,48 +248,38 @@ var JSqfd = (function() {
 			.style("fill", function(d) {
 				return color(functions.indexOf(d.function));
 			})
-			.attr("x", offsetx)
-			.attr("y", function(d) {
-				return myoffsety + d.r * mylengthy;
-			})
+			.attr("x", 0)
+			.attr("y", 0)
 			.attr('rx', 5)
 			.attr('ry', 5)
 			.attr("width", config.funcw)
 			.attr("height", config.texth);
 
 		whats.append("text").attr("class", "mytext")
-			.attr("x", offsetx + 2)
-			.attr("y", function(d) {
-				return myoffsety + (config.texth / 2) + d.r * mylengthy;
-			})
+			.attr("x", 2)
+			.attr("y", config.texth / 2)
 			.attr("dy", ".35em")
 			.text(function(d) {
 				return d.function;
 			});
 		// What details rectangle + text
 		whats.append("rect").attr("class", "mybox classicdesign")
-			.attr("x", offsetx + config.funcw)
-			.attr("y", function(d) {
-				return myoffsety + d.r * mylengthy;
-			})
+			.attr("x", config.funcw)
+			.attr("y", 0)
 			.attr("width", config.textw)
 			.attr("height", config.texth);
 
 		whats.append("rect").attr("class", "mybox flatdesign")
-			.attr("x", offsetx + config.funcw)
-			.attr("y", function(d) {
-				return myoffsety + d.r * mylengthy;
-			})
+			.attr("x", config.funcw)
+			.attr("y", 0)
 			.attr('rx', 5)
 			.attr('ry', 5)
 			.attr("width", config.textw)
 			.attr("height", config.texth);
 
 		whats.append("text").attr("class", "mytext")
-			.attr("x", offsetx + 2 + config.funcw)
-			.attr("y", function(d) {
-				return myoffsety + (config.texth / 2) + d.r * mylengthy;
-			})
+			.attr("x", 2 + config.funcw)
+			.attr("y", config.texth / 2)
 			.attr("dy", ".35em")
 			.text(function(d) {
 				return d.name;
@@ -389,9 +384,20 @@ var JSqfd = (function() {
 			});
 
 		impsData.append("rect")
-			.attr("class", "mycase")
+			.attr("class", "mycase classicdesign")
 			.attr("x", config.spacing)
 			.attr("y", config.spacing)
+			.attr("width", config.texth)
+			.attr("height", config.texth)
+			.on("mouseover", JSqfd.handleMouseOver)
+			.on("mouseout", JSqfd.handleMouseOut);
+			
+		impsData.append("rect")
+			.attr("class", "mycase flatdesign")
+			.attr("x", config.spacing)
+			.attr("y", config.spacing)
+			.attr('rx', 5)
+			.attr('ry', 5)
 			.attr("width", config.texth)
 			.attr("height", config.texth)
 			.on("mouseover", JSqfd.handleMouseOver)
@@ -427,23 +433,25 @@ var JSqfd = (function() {
 
 		for (i = 0; i <= len - 1; i += 1) {
 			myArray[i].dx = config.spacing + myArray[i].c * 2 * config.spacing;
-			myArray[i].rx = offsetx + config.texth * myArray[i].c;
-			myArray[i].ry = offsety;
-			myArray[i].tx = 10 + config.spacing + myArray[i].c * 2 * config.spacing + offsetx + config.texth * myArray[i].c;
-			myArray[i].ty = offsety;
+			myArray[i].rx = config.texth * myArray[i].c;
+			myArray[i].ry = 0;
+			myArray[i].tx = 10 + config.spacing + myArray[i].c * 2 * config.spacing + config.texth * myArray[i].c;
+			myArray[i].ty = 0;
 		}
 
-		var hows = myContainer.append("g").attr("id", "groupHows").selectAll("rect")
+		var hows = myContainer.append("g")
+		    .attr("id", "groupHows")
+		    .attr('transform', 'translate(' + String(offsetx) + ', ' + String(offsety) + ')')
+		    .selectAll("g")
 			.data(myArray)
-			.enter();
+			.enter()
+			.append('svg:g');
 
 		hows.append("rect").attr("class", "mybox classicdesign")
 			.attr("x", function(d) {
 				return d.rx;
 			})
-			.attr("y", function(d) {
-				return d.ry + config.bomh;
-			})
+			.attr("y", config.bomh)
 			.attr("width", config.texth)
 			.attr("height", config.textw)
 			.attr("transform", function(d) {
@@ -454,9 +462,7 @@ var JSqfd = (function() {
 			.attr("x", function(d) {
 				return d.rx;
 			})
-			.attr("y", function(d) {
-				return d.ry + config.bomh;
-			})
+			.attr("y", config.bomh)
 			.attr('rx', 5)
 			.attr('ry', 5)
 			.attr("width", config.texth)
@@ -478,9 +484,7 @@ var JSqfd = (function() {
 			.attr("x", function(d) {
 				return d.tx;
 			})
-			.attr("y", function(d) {
-				return d.ty + config.bomh;
-			})
+			.attr("y", config.bomh)
 			.attr("dy", ".35em")
 			.attr("writing-mode", 'tb')
 			.text(function(d) {
@@ -494,9 +498,7 @@ var JSqfd = (function() {
 			.attr("x", function(d) {
 				return d.rx;
 			})
-			.attr("y", function(d) {
-				return d.ry;
-			})
+			.attr("y", 0)
 			.attr("width", config.texth)
 			.attr("height", config.bomh)
 			.attr("transform", function(d) {
@@ -510,9 +512,7 @@ var JSqfd = (function() {
 			.attr("x", function(d) {
 				return d.rx;
 			})
-			.attr("y", function(d) {
-				return d.ry;
-			})
+			.attr("y", 0)
 			.attr('rx', 5)
 			.attr('ry', 5)
 			.attr("width", config.texth)
@@ -528,9 +528,7 @@ var JSqfd = (function() {
 			.attr("x", function(d) {
 				return d.tx;
 			})
-			.attr("y", function(d) {
-				return d.ry;
-			})
+			.attr("y", 0)
 			.attr("dy", ".35em")
 			.attr("writing-mode", 'tb')
 			.text(function(d) {
@@ -540,7 +538,12 @@ var JSqfd = (function() {
 		return 0;
 	};
 
-
+	/**
+	 * draw correlation (big triangle)
+	 * 
+	 * @param {string} myContainer
+	 * @param {array} myArray
+	 */
 	var drawCorrelation = function(myContainer, myArray) {
 
 		var offsetx = 10 + config.funcw + config.textw;
