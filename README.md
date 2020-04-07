@@ -1,6 +1,8 @@
 # JSqfd
 QFD (Quality Function deployement) drawing from JSON file
 
+[Live demo here](https://benardt.github.io/index_jsqfd.htm)
+
 ## Screenshots
 
 ![Global view](./misc/VueGlobale.png)
