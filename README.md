@@ -1,5 +1,5 @@
 # JSqfd
-QFD (Quality Function deployement) drawing from JSON file
+QFD (Quality Function deployment) drawing from JSON file
 
 [Live demo here](https://benardt.github.io/index_jsqfd.htm)
 
