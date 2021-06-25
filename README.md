@@ -1,3 +1,5 @@
+[![Code Grade](https://www.code-inspector.com/project/24168/score/svg)](https://frontend.code-inspector.com/project/24168/dashboard)
+
 # JSqfd
 QFD (Quality Function deployment) drawing from JSON file
 
